@@ -17,6 +17,7 @@ vector<bool> containsStack;
 
 
 void tarjan(int v);
+int conta_pois();
 
 int main() {
     
@@ -43,11 +44,11 @@ int main() {
         }
 
      
-        for(int i = 0; i < n ; i++){
-            if(dfs[i+1]==-1)
-                tarjan(i+1);
+        for(int i = 1; i < n ; i++){
+            if(dfs[i] ==-1)
+                tarjan(i);
         }
-        cout << Scc.size() <<"\n";
+        cout << conta_pois() <<"\n";
         t = 0;
         S =  stack<int>();
         Scc =  stack<stack<int>>();
@@ -57,6 +58,18 @@ int main() {
     return 0;
 }
 
+int conta_pois(){
+    int count = 0;
+    stack<int> aux;
+    while(!Scc.empty()){
+        aux = Scc.top();
+        Scc.pop();
+        if(aux.size() > 1){
+            count++;
+        }
+    }
+    return count;
+}
 
 void tarjan(int v){
     low[v] = dfs[v] = t;
