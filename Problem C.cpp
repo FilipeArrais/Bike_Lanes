@@ -4,6 +4,7 @@
 #include <set>
 #include <vector>
 #include <stack>
+#include <tuple>
 using namespace std;
 
 int n;
@@ -17,7 +18,7 @@ vector<bool> containsStack;
 
 
 void tarjan(int v);
-int conta_pois();
+pair<int,int> conta_pois();
 
 int main() {
     
@@ -42,25 +43,32 @@ int main() {
             graph[A][B] = D;
             //cout << A << " " << B << " " << D << "\n";    
         }
-        /*for(int i = 0; i <= n; i++){
-            for(int j = 0; j <= n ; j++){
-                if(graph[i][j] != 0){
-                  cout << graph[i][j]<<" ";   
-                }
-               
-            }
-            cout << "\n";
-        }*/
+
 
      
         for(int i = 1; i <= n ; i++){
-            if(dfs[i] ==-1)
+            if(dfs[i] == -1)
                 tarjan(i);
         }
-        cout << conta_pois() <<"\n";
+        
+        
+        pair<int,int> p = conta_pois();
+        if(q == 1){
+            cout << p.first <<"\n";
+        }
+        else if(q == 2){
+            cout << p.first << " " << p.second << "\n";  
+        }
+        else if (q == 3){
+            cout << p.first << " " << p.second << " " << "0" << "\n";  
+        }
+        else{
+            cout << p.first << " " << p.second <<" " << "0" <<" " << "0" << "\n";  
+        }
+
         t = 1;
         S =  stack<int>();
-        Scc =  stack<stack<int>>();
+        //Scc =  stack<stack<int>>();
         
     }
 
@@ -68,19 +76,23 @@ int main() {
 }
 
 //Acrescentar maior
-int conta_pois(){
+pair<int,int> conta_pois(){
     int count = 0;
+    size_t maior = 0;
     stack<int> aux;
     while(!Scc.empty()){
         aux = Scc.top();
         Scc.pop();
         if(aux.size() > 1){
             count++;
+            if(aux.size() > maior){
+                maior = aux.size();
+            }
         }
-    }
 
-    
-    return count;
+    }
+    //cout << "maoir:" << maior <<"\n";
+    return pair(count, maior);
 }
 
 void tarjan(int v){
