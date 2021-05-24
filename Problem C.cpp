@@ -53,6 +53,7 @@ int main() {
         
         
         pair<int,int> p = conta_pois();
+        
         if(q == 1){
             cout << p.first <<"\n";
         }
