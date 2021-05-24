@@ -12,13 +12,35 @@ vector<vector<int>> graph;
 vector<int> low;
 vector<int> dfs;
 int t = 1;
-stack<int> S;
-stack<stack<int>> Scc;
+//stack<int> S;
+vector<int> S;
+//stack<stack<int>> Scc;
+vector<vector<int>> Scc;
 vector<bool> containsStack;
 
 
 void tarjan(int v);
 pair<int,int> conta_pois();
+
+//Acrescentar maior
+/*pair<int,int> conta_pois(){
+    int count = 0;
+    size_t maior = 0;
+    stack<int> aux;
+    while(!Scc.empty()){
+        aux = Scc.top();
+        Scc.pop();
+        if(aux.size() > 1){
+            count++;
+            if(aux.size() > maior){
+                maior = aux.size();
+            }
+        }
+
+    }
+    //cout << "maoir:" << maior <<"\n";
+    return pair(count, maior);
+}*/
 
 int main() {
     
@@ -53,6 +75,13 @@ int main() {
         
         
         pair<int,int> p = conta_pois();
+
+        vector<vector<int>> G;
+        for(auto i : Scc){
+           for(auto j: i){
+               
+           }
+        }
         
         if(q == 1){
             cout << p.first <<"\n";
@@ -68,38 +97,34 @@ int main() {
         }
 
         t = 1;
-        S =  stack<int>();
-        //Scc =  stack<stack<int>>();
+        S =  vector<int>(); //stack<int>();
+        Scc =  vector<vector<int>>();
         
     }
 
     return 0;
 }
 
-//Acrescentar maior
+
+
 pair<int,int> conta_pois(){
     int count = 0;
     size_t maior = 0;
-    stack<int> aux;
-    while(!Scc.empty()){
-        aux = Scc.top();
-        Scc.pop();
-        if(aux.size() > 1){
+    for(auto i: Scc){
+        if(i.size() > 1){
             count++;
-            if(aux.size() > maior){
-                maior = aux.size();
+            if(i.size() > maior){
+                maior = i.size();
             }
         }
-
     }
-    //cout << "maoir:" << maior <<"\n";
     return pair(count, maior);
 }
 
 void tarjan(int v){
     low[v] = dfs[v] = t;
     t = t + 1;
-    S.push(v);
+    S.push_back(v);
     containsStack[v] = true;
     for(int w = 0; w <= n; w++){
         if(graph[v][w] != 0){
@@ -116,14 +141,14 @@ void tarjan(int v){
         
     }
     if(low[v] == dfs[v]){
-        stack<int> C;
+        vector <int> C;
         int w;
         do{
-           w = S.top(); 
-           S.pop();
+           w = S[S.size() - 1]; 
+           S.pop_back();
            containsStack[w] = false;
-           C.push(w);
+           C.push_back(w);
         }while(w != v);
-        Scc.push(C);
+        Scc.push_back(C);
     }
 }
