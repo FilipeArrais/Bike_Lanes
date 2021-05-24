@@ -1,46 +1,31 @@
-//g++ -std=c++17 -Wall -Wextra -O2 "Problem C.cpp" -lm
+//g++ -std=c++17 -Wall -Wextra -O2 "ProblemC_3.cpp" -lm
 #include <iostream>
-#include <map>
-#include <set>
+//#include <set>
 #include <vector>
-#include <stack>
-#include <tuple>
+#include <algorithm>
 using namespace std;
 
-int n;
+typedef pair<int, int> edge;
+
 vector<vector<int>> graph;
-vector<int> low;
-vector<int> dfs;
-int t = 1;
-//stack<int> S;
-vector<int> S;
-//stack<stack<int>> Scc;
 vector<vector<int>> Scc;
 vector<bool> containsStack;
+vector<int> low;
+vector<int> dfs;
+vector<int> S;
+
+//kruskal
+vector<pair<int, edge>> G;
+vector<int> set;
+vector<int> rank1;
+int soma_lane = 0;
+int maior_lane = 0;
+
+int q, n, t = 1;
 
 
 void tarjan(int v);
 pair<int,int> conta_pois();
-
-//Acrescentar maior
-/*pair<int,int> conta_pois(){
-    int count = 0;
-    size_t maior = 0;
-    stack<int> aux;
-    while(!Scc.empty()){
-        aux = Scc.top();
-        Scc.pop();
-        if(aux.size() > 1){
-            count++;
-            if(aux.size() > maior){
-                maior = aux.size();
-            }
-        }
-
-    }
-    //cout << "maoir:" << maior <<"\n";
-    return pair(count, maior);
-}*/
 
 int main() {
     
@@ -50,7 +35,7 @@ int main() {
     //m numero de ligaçoes
     // q numero de questoes
     //Ponto A , Ponto B e D a distancia entre ele;
-    int num_casos,  m, q, A, B, D;
+    int num_casos,  m, A, B, D;
     cin >> num_casos;
 
     for(int _ = 0; _ < num_casos; _++){
@@ -66,23 +51,14 @@ int main() {
             //cout << A << " " << B << " " << D << "\n";    
         }
 
-
-     
         for(int i = 1; i <= n ; i++){
             if(dfs[i] == -1)
                 tarjan(i);
         }
-        
-        
+                
         pair<int,int> p = conta_pois();
 
-        vector<vector<int>> G;
-        for(auto i : Scc){
-           for(auto j: i){
-               
-           }
-        }
-        
+
         if(q == 1){
             cout << p.first <<"\n";
         }
@@ -90,14 +66,16 @@ int main() {
             cout << p.first << " " << p.second << "\n";  
         }
         else if (q == 3){
-            cout << p.first << " " << p.second << " " << "0" << "\n";  
+            cout << p.first << " " << p.second << " " << maior_lane << "\n";  
         }
         else{
-            cout << p.first << " " << p.second <<" " << "0" <<" " << "0" << "\n";  
+            cout << p.first << " " << p.second << " " << maior_lane <<" " << soma_lane << "\n";  
         }
 
         t = 1;
-        S =  vector<int>(); //stack<int>();
+        soma_lane = 0;
+        maior_lane = 0;
+        S =  vector<int>();
         Scc =  vector<vector<int>>();
         
     }
@@ -105,7 +83,57 @@ int main() {
     return 0;
 }
 
+int find_set(int a){
+    if(set[a] != a)
+        set[a] = find_set(set[a]);
+    return set[a];    
+}
 
+void link(int a, int b){
+    if(rank1[a] > rank1[b])
+        set[b] = a;
+    else
+        set[a] = b;
+    if(rank1[a] == rank1[b])
+        rank1[b]++;
+}
+
+void union_set(int a, int b){
+    link(find_set(a), find_set(b));
+}
+
+void make_set(){
+    //inicializar
+    set = vector<int>(n+1);
+    rank1 = vector<int>(n+1);
+    
+    for(auto poi: Scc[Scc.size() -1]){
+        set[poi] = poi;
+    }
+}
+
+void Kruskal(){
+    //inicializar
+    int count = 0;
+    make_set();
+
+    //ordenar vetor
+    sort(G.begin(), G.end());
+    
+    for(auto a: G){
+        pair<int, int> edge = a.second;
+        //cout << a.first << "\t" << edge.first << " " << edge.second << "\n";
+        if(find_set(edge.first) != find_set(edge.second)){
+            count += a.first;
+            union_set(edge.first, edge.second);
+        }
+    } 
+    
+    if(count > maior_lane)
+        maior_lane = count;
+
+    soma_lane += count;    
+}
 
 pair<int,int> conta_pois(){
     int count = 0;
@@ -128,8 +156,7 @@ void tarjan(int v){
     containsStack[v] = true;
     for(int w = 0; w <= n; w++){
         if(graph[v][w] != 0){
-            //cout <<"vertice: "<< v <<"\n";
-            //cout << graph[w][v]<<"\n";
+            
             if(dfs[w] == -1){
                 tarjan(w);
                 low[v] = min(low[v], low[w]);
@@ -144,11 +171,24 @@ void tarjan(int v){
         vector <int> C;
         int w;
         do{
-           w = S[S.size() - 1]; 
-           S.pop_back();
-           containsStack[w] = false;
-           C.push_back(w);
+            w = S[S.size() - 1]; 
+            S.pop_back();
+            containsStack[w] = false;
+            C.push_back(w);
         }while(w != v);
+
         Scc.push_back(C);
+    
+        if(q > 2){
+            for(auto z: C){
+                for(auto x: C){
+                    if(graph[x][z] != 0) 
+                        G.push_back({graph[x][z], {x, z}});
+                }             
+            }
+
+            Kruskal();
+            G.clear();
+        }
     }
 }
